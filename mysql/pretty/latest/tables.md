@@ -28,20 +28,20 @@ CREATE TABLE Book_Copy (
     `Condition` VARCHAR(32) NOT NULL, -- not sure what type to use
     Renewal BOOLEAN NOT NULL, -- assuming Y/N
     Copy_num TINYINT UNSIGNED NOT NULL, -- correct int type?
-    ISBN DECIMAL(13) NOT NULL,
+    ISBN VARCHAR(10) NOT NULL,
     PRIMARY KEY(ISBN, Copy_num) -- only ISBN OR Copy_num must be unique
 );
 CREATE TABLE Check_Out (
     Library_ID DECIMAL(10) NOT NULL, -- FK
     Due_date DATE NOT NULL,
-    ISBN DECIMAL(13) NOT NULL, -- FK
+    ISBN VARCHAR(10) NOT NULL, -- FK
     Copy_num TINYINT UNSIGNED NOT NULL, -- FK
     FOREIGN KEY (Library_ID) REFERENCES Member(Library_ID),
     FOREIGN KEY (ISBN, Copy_num) REFERENCES Book_Copy(ISBN, Copy_num)
 );
 CREATE TABLE Overdue_Books (
     Library_ID DECIMAL(10) NOT NULL, -- FK
-    ISBN DECIMAL(13) NOT NULL, -- FK
+    ISBN VARCHAR(10) NOT NULL, -- FK
     Copy_num TINYINT UNSIGNED NOT NULL, -- FK
     FOREIGN KEY (Library_ID) REFERENCES Member(Library_ID),
     FOREIGN KEY (ISBN, Copy_num) REFERENCES Book_Copy(ISBN, Copy_num)

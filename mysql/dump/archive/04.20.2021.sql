@@ -33,7 +33,7 @@ CREATE TABLE `Book_Copy` (
   `Condition` varchar(32) NOT NULL,
   `Renewal` tinyint(1) NOT NULL,
   `Copy_num` tinyint unsigned NOT NULL,
-  `ISBN` varchar(10) NOT NULL,
+  `ISBN` decimal(13,0) NOT NULL,
   PRIMARY KEY (`ISBN`,`Copy_num`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -57,7 +57,7 @@ DROP TABLE IF EXISTS `Check_Out`;
 CREATE TABLE `Check_Out` (
   `Library_ID` decimal(10,0) NOT NULL,
   `Due_date` date NOT NULL,
-  `ISBN` varchar(10) NOT NULL,
+  `ISBN` decimal(13,0) NOT NULL,
   `Copy_num` tinyint unsigned NOT NULL,
   KEY `Library_ID` (`Library_ID`),
   KEY `ISBN` (`ISBN`,`Copy_num`),
@@ -138,7 +138,7 @@ DROP TABLE IF EXISTS `Overdue_Books`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Overdue_Books` (
   `Library_ID` decimal(10,0) NOT NULL,
-  `ISBN` varchar(10) NOT NULL,
+  `ISBN` decimal(13,0) NOT NULL,
   `Copy_num` tinyint unsigned NOT NULL,
   KEY `Library_ID` (`Library_ID`),
   KEY `ISBN` (`ISBN`,`Copy_num`),
@@ -190,4 +190,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-04-21 12:54:12
+-- Dump completed on 2021-04-20  0:09:22
