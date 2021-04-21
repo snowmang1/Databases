@@ -1,0 +1,61 @@
+
+body {
+  
+  background-repeat: no-repeat;
+}
+H1 {
+  text-align: center;
+}
+#nav {
+
+    text-align: center;
+    position: relative;
+    height: 50%;
+    width: 75%;
+    border-radius: 50% 50%;
+    margin: 2%;
+    margin-left: 10%;
+    margin-right: 10%;
+    padding-top: 1%;
+}
+#nav>ul>li {
+  
+  list-style-type: none;
+}
+#stats{
+  text-align: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* end */
