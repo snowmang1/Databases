@@ -1,0 +1,21 @@
+table{
+  border: 2px solid #000000;
+  border-collapse: collapse;
+}
+th, td {
+  padding-right: 3em;
+  padding-top: 1em;
+}
+th {
+  text-transform: uppercase;
+  border-bottom: 2px solid #000000;
+  font-size: 90%;
+  text-align: left;
+}
+td{
+  font-size: 75%;
+  text-align: left;
+}
+tr:hover {
+  background-color: #ffc0cb;
+}
