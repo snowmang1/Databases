@@ -1,8 +1,26 @@
 
 body {
-  background-color: #ffffff;
+  background-image: url("../images/background.jpeg");
+  background-repeat: no-repeat;
 }
-div.mybox{
+div#container {
+  position: relative;
+  height: 50%;
+  width: 75%;
+  background-color: #666666;
+  border-radius: 15% 15%;
+  background-blend-mode: darken;
+  border: solid;
+  margin-left: 6%;
+  margin-top: 5%;
+  border-width: 2em;
+  border-color: transparent;
+  padding: 2%;
+  color: #000000;
+
+  box-shadow: 10% 10% 10% 25% #777777;
+}
+div.welcome{
   background-color: #666666;
   position: relative;
   height: 50%;
@@ -11,36 +29,38 @@ div.mybox{
   margin-left: 10%;
   margin-right: 10%;
   padding: 2%;
-  height: 40%;
-  width: 70%%;
   color: #000000;
 
   box-shadow: 10% 10% 10% 25% #777777;
-
 }
 H1 {
   text-align: center;
 }
 #nav {
-  background-color: #666666;
+  background-color: #888888;
   position: relative;
   height: 50%;
   width: 75%;
+  border-radius: 50% 50%;
 
   margin: 2%;
   margin-left: 10%;
   margin-right: 10%;
   padding: 2%;
-  color: #ffffff;
-
-  box-shadow: 10% 10% 10% 25% #777777;
+  box-shadow: 0 0 5px 15px #444444;
+  opacity: .3;
 }
 #nav>ul>li {
   display: inline;
   list-style-type: none;
   padding: 10%;
 }
-
+#stats{
+  text-align: center;
+}
+#about{
+  text-align: center;
+}
 
 
 
