@@ -1,0 +1,41 @@
+#space {
+    text-indent: 50px;
+    padding-top: 2em;
+    position: relative;
+    height: 50%;
+    width: 90%;
+    margin-left: 0%;
+    margin-top: 3%;
+    border-width: 0.2em;
+    padding: 5%;
+}
+
+table {
+    background-color: #ffffff;
+    position: relative;
+    height: 50%;
+    width: 60%;
+}   
+
+body {
+    background-color: #777777;
+}
+
+ul {
+    margin-right: 0%;
+    padding-right: 2em;
+    position: relative;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    width: 8%;
+    margin-left: 1%;
+    margin-top: 3%;
+    background-color: #ffffff;
+}
+
+div.welcome {
+    padding-top: 1em;
+    margin-left: 40%;
+    margin-right: 40%;
+    background-color: #ffffff;
+}
