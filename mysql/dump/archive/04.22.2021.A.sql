@@ -62,7 +62,7 @@ CREATE TABLE `Check_Out` (
   `ISBN` char(17) NOT NULL,
   `Copy_num` tinyint unsigned NOT NULL,
   PRIMARY KEY (`Library_ID`,`ISBN`,`Copy_num`),
-  KEY `Book_ID` (`ISBN`,`Copy_num`),
+  KEY `ISBN` (`ISBN`,`Copy_num`),
   CONSTRAINT `Check_Out_ibfk_1` FOREIGN KEY (`Library_ID`) REFERENCES `Member` (`Library_ID`),
   CONSTRAINT `Check_Out_ibfk_2` FOREIGN KEY (`ISBN`, `Copy_num`) REFERENCES `Book_Copy` (`ISBN`, `Copy_num`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -87,13 +87,13 @@ UNLOCK TABLES;
 /*!50032 DROP TRIGGER IF EXISTS update_aval */;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`ubuntu`@`localhost`*/ /*!50003 TRIGGER `update_aval` AFTER INSERT ON `Check_Out` FOR EACH ROW BEGIN
-    UPDATE `Book_Copy`
+    UPDATE Book_Copy
     SET
-        `Availability` = false
+        Availability = false
     WHERE
-        `ISBN` = NEW.ISBN AND
-        `Copy_num` = NEW.Copy_num AND
-        `Availability` = true;
+        ISBN = NEW.ISBN AND
+        Copy_num = NEW.Copy_num AND
+        Availability = true;
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -114,13 +114,12 @@ CREATE TABLE `Member` (
   `Street` varchar(32) DEFAULT NULL,
   `Zip_Code` decimal(6,0) DEFAULT NULL,
   `City` varchar(32) DEFAULT NULL,
-  `State` char(2) DEFAULT NULL,
-  `Strike_Count` tinyint unsigned NOT NULL DEFAULT (0),
+  `State` varchar(2) DEFAULT NULL,
+  `Strike_Count` decimal(1,0) NOT NULL,
   `Payment_Method` varchar(32) NOT NULL,
   `Outstanding_Balance` decimal(4,2) DEFAULT NULL,
   PRIMARY KEY (`Library_ID`),
-  CONSTRAINT `Member_chk_1` CHECK ((`Strike_Count` between 0 and 3)),
-  CONSTRAINT `Member_chk_2` CHECK ((`Outstanding_Balance` between 0.00 and 100.00))
+  CONSTRAINT `Member_chk_1` CHECK ((`Outstanding_Balance` >= 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -145,7 +144,7 @@ CREATE TABLE `Overdue_Books` (
   `ISBN` char(17) NOT NULL,
   `Copy_num` tinyint unsigned NOT NULL,
   PRIMARY KEY (`Library_ID`,`ISBN`,`Copy_num`),
-  KEY `Overdue_books` (`ISBN`,`Copy_num`),
+  KEY `ISBN` (`ISBN`,`Copy_num`),
   CONSTRAINT `Overdue_Books_ibfk_1` FOREIGN KEY (`Library_ID`) REFERENCES `Member` (`Library_ID`),
   CONSTRAINT `Overdue_Books_ibfk_2` FOREIGN KEY (`ISBN`, `Copy_num`) REFERENCES `Book_Copy` (`ISBN`, `Copy_num`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -171,7 +170,7 @@ CREATE TABLE `Preferences` (
   `Library_ID` char(10) NOT NULL,
   `type` varchar(32) DEFAULT NULL,
   `value` varchar(32) DEFAULT NULL,
-  KEY `Library_ID` (`Library_ID`),
+  PRIMARY KEY (`Library_ID`),
   CONSTRAINT `Preferences_ibfk_1` FOREIGN KEY (`Library_ID`) REFERENCES `Member` (`Library_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -201,7 +200,7 @@ DELIMITER ;;
 CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `getAvalCopies`(in bkId char(17))
 BEGIN
     SELECT `Copy_num` AS `Available Copies`, `Condition`
-    FROM `Book_Copy` WHERE `ISBN`=bkId AND `Availability` is true ORDER BY `Condition` desc;
+    FROM Book_Copy WHERE ISBN=bkId AND Availability is true ORDER BY `Condition` desc;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -220,15 +219,15 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `getDueDate`(in bID char(17), cID tinyint unsigned)
 BEGIN
-    SET @MULTIPLIER=(SELECT `Renewal` FROM `Book_Copy` WHERE (`ISBN`=bID AND
-        `Copy_num`=cID))+1;
+    SET @MULTIPLIER=(SELECT Renewal FROM Book_Copy WHERE (ISBN=bID AND
+        Copy_num=cID))+1;
     IF @MULTIPLIER<=0 THEN
         SET @MULTIPLIER=1;
     END IF;
-    SELECT `Checkout_date`, DATE(ADDDATE(`Checkout_date`, INTERVAL 7*@MULTIPLIER DAY))
-        AS `Due_date`
-    FROM `Check_Out`
-    WHERE `ISBN`=bID AND `Copy_num`=cID;
+    SELECT Checkout_date, DATE(ADDDATE(Checkout_date, INTERVAL 7*@MULTIPLIER DAY))
+        AS Due_date
+    FROM Check_Out
+    WHERE ISBN=bID AND Copy_num=cID;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -247,8 +246,8 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `getQuantity`(in bkId char(17))
 BEGIN
-    SELECT `Title`, COUNT(*) AS `Quantity`
-    FROM `Book_Copy` WHERE `ISBN`=bkId GROUP BY `Title`;
+    SELECT Title, COUNT(*) AS `Quantity`
+    FROM Book_Copy WHERE ISBN=bkId GROUP BY Title;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -265,4 +264,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-04-22 16:11:03
+-- Dump completed on 2021-04-22  3:44:51
