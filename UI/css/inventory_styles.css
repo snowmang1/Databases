@@ -3,8 +3,8 @@ body{
 }
 .containor {
   background-color: #ffffff;
-  width: 70%;
-  height: 70%;
+  width: 50em;
+  height: 7em;
   margin-left: 5%;
   margin-top: 5%;
   padding: 4%;
@@ -23,4 +23,9 @@ div#buttons{
 }
 :target>p{
   border: 1px solid blue;
+}
+.back{
+  text-align: center;
+  margin-top: 2%;
+  color: white;
 }

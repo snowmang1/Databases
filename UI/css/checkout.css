@@ -1,0 +1,47 @@
+body{
+  background-color: #666666;
+}
+div.containor{
+  background-color: white;
+  border: 2px solid #aaaaaa;
+  margin-left: 26%;
+  margin-top: 7%;
+  border-radius: 1em;
+  width: 30em;
+}
+.inform{
+  padding-left: 20%;
+  padding-top: 1em;
+}
+.lab{
+  padding-right: 6%;
+  margin-top: 4%;
+}
+.submit{
+  text-align: right;
+  padding-right: 1em;
+  padding-bottom: .5em;
+}
+.submit>input{
+  background-color: black;
+  color: white;
+  border-radius: 1em;
+  text-shadow: 1em;
+  box-shadow: 0 0 0 2px #333333;
+}
+.submit>input:hover{
+  cursor: pointer;
+}
+
+#in:hover{
+  cursor: pointer;
+}
+#out:hover{
+  cursor: pointer;
+}
+.headL{
+  margin-top: 2%;
+
+  text-align: center;
+  color: white;
+}
