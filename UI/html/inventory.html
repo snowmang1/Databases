@@ -6,34 +6,38 @@
     <style>
       @import "../css/inventory_styles.css";
       @import "../css/tables.css";
+      @import "../css/buttons.css";
     </style>
   </head>
   <body>
 
-      <div id="buttons">
-        <p>Place hold</p>
-        <p>change condition</p>
-      </div>
+      <div class="containor">
+        <p style="text-align: center;">please select a book then proceed as instructed.</p>
+        <div id="buttons">
+          <p>Place hold</p>
+          <p>change condition</p>
+        </div>
 
-      <div class="table">
-        <table>
-          <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Genre</th>
-            <th>ISBN</th>
-            <th>Avalibility</th>
-            <th>Condition</th>
-          </tr>
-          <tr>
-            <td>LOTR</td>
-            <td>JRR Tolkien</td>
-            <td>Fantasy</td>
-            <td>1234567890</td>
-            <td>OUT</td>
-            <td>great</td>
-          </tr>
-        </table>
+        <div class="table">
+          <table>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Genre</th>
+              <th>ISBN</th>
+              <th>Avalibility</th>
+              <th>Condition</th>
+            </tr>
+            <tr class="data">
+              <td><a href="#buttons">LOTR</a></td>
+              <td>JRR Tolkien</td>
+              <td>Fantasy</td>
+              <td>1234567890</td>
+              <td>OUT</td>
+              <td>great</td>
+            </tr>
+          </table>
+        </div>
       </div>
 
   </body>

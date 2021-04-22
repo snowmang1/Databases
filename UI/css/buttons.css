@@ -1,0 +1,11 @@
+#buttons>p{
+  background-color: #00ff00;
+  text-align: center;
+  border-radius: 50%;
+  padding: 3% 8% 3% 8%;
+}
+#buttons>p:hover{
+  color: #ffffff;
+  background-color: #0000ff;
+  cursor: pointer;
+}

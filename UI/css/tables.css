@@ -1,9 +1,10 @@
 table{
   border: 2px solid #000000;
   border-collapse: collapse;
+  float: right;
 }
 th, td {
-  padding-right: 3em;
+  padding-right: 3em; /*from 3em to 13em*/
   padding-top: 1em;
 }
 th {
@@ -16,6 +17,10 @@ td{
   font-size: 75%;
   text-align: left;
 }
-tr:hover {
+tr.data:hover {
   background-color: #ffc0cb;
+}
+div.welcome{ /*title in middle*/
+    text-align: center;
+    padding-bottom: 1em;
 }

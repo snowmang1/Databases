@@ -1,16 +1,26 @@
-body {
+body{
+  background-color: #777777;
+}
+.containor {
+  background-color: #ffffff;
   width: 70%;
-  height: 50%;
+  height: 70%;
   margin-left: 5%;
   margin-top: 5%;
-  border: 1px solid #000000;
   padding: 4%;
+  border: 1px solid #000000;
+  padding-bottom: 10%;
 }
 div.table{
   float: right;
-  clear: left;
+  z-index: 10;
+  position: relative;
+  right: 0;
+  top: 0;
 }
-#buttons{
-  clear: both;
-  float:left;
+div#buttons{
+  position: absolute;
+}
+:target>p{
+  border: 1px solid blue;
 }
