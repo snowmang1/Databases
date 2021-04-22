@@ -40,12 +40,11 @@ H1 {
   background-color: #eeeeee;
   position: relative;
   height: 50%;
-  width: 75%;
-  border-radius: 50% 50%;
+  width: 90%;
+  border-radius: 10em;
 
   margin: 2%;
-  margin-left: 10%;
-  margin-right: 10%;
+  margin-left: 4%;
   padding: 2%;
   box-shadow: 0 0 5px 15px #444444;
   opacity: .3;
@@ -53,7 +52,7 @@ H1 {
 #nav>ul>li {
   display: inline;
   list-style-type: none;
-  padding: 10%;
+  padding: 4%;
 }
 #stats{
   text-align: center;
