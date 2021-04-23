@@ -30,14 +30,19 @@ ul {
     width: 10%;
     margin-left: 1%;
     margin-top: 3%;
+    margin-bottom: 5%;
     background-color: #ffffff;
 }
 
 div.welcome {
-    padding-top: 1em;
+    text-align: center;
+    position: relative;
+    width: 18%;
     margin-left: 40%;
-    margin-right: 40%;
     background-color: #ffffff;
+    padding-top: 1%;
+    
+ 
 }
 #welcome2 {
     text-align: center;
@@ -46,6 +51,18 @@ div.welcome {
     
     width: 18%;
     margin-left: 40%;
-    margin-top: 3%;
+    
     background-color: #ffffff;
 }
+
+#welcome3 {
+
+    padding: 2%;
+   
+    width: 15%;
+    margin-left: 1%;
+    background-color: #ffffff;
+}
+
+
+

@@ -6,12 +6,17 @@
     <title>Hicksville County Library</title>
     <link href="../css/tables.css" text="text/css" rel="stylesheet" />
     <link href="../css/manage.css" text="text/css" rel="stylesheet" />
+    <link href="../css/buttons.css" text="text/css" rel="stylesheet" />
 </head>
 
   <body>
 
       <div id="container">
           <!--  This is the conatiner and it will hold all information for this landing page --->
+
+          <div class="headL">
+              <p style="color:white">want to go back to main menu? <br> Click <a href="main.html">here</a></p style="color:blue">            
+          </div>
 
           <div class="welcome">
               <H1> Manage Account </H1>
@@ -92,14 +97,32 @@
                   </table>
 
               </div>
-              <ul>
 
-                  <li><a href="">Edit</a></li>
-                  <li><a href="">Save</a></li>
-
-              </ul>
+              <div id="welcome3">
+                  <form action="/action_page.php">
+                      <div class="inform">
+                          <label for="ISBN" class="lab">Enter Preference:</label>
+                          <input type="text" id="ISBN" name="ISBN" placeholder="preference"><br><br>
+                      </div>
+                      <div class="inform">
+                          <label for="in_out" class="lab"></label>
+                          <input type="radio" id="in" name="checking:">
+                          <label for="in" class="lab">GENRE</label>
+                          <input type="radio" id="out" name="checking:">
+                          <label for="out" class="out">AUTHOR</label><br>
+                          <input type="radio" id="out" name="checking:">
+                          <label for="out" class="out">BOOK</label><br>
+                      </div>
+                      <div id="welcome2">
+                          <H1>
+                          </H1>
+                      </div>
+                      <div class="submit" class="inform">
+                          <input type="submit" value="submit">
+                      </div>
+                  </form>
+              </div>
           </div>
-      </div>
-  </body>
+</body>
 
 </html> <!-- tag closing -->
