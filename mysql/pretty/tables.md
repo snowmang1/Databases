@@ -22,9 +22,9 @@ CREATE TABLE `Preferences` (
 );
 DROP TABLE IF EXISTS `Book_Copy`;
 CREATE TABLE `Book_Copy` (
-    `Title` VARCHAR(32) NOT NULL,
-    `Author` VARCHAR(32) NOT NULL,
-    `Genre` VARCHAR(32), -- how large?
+    `Title` VARCHAR(255) NOT NULL,
+    `Author` VARCHAR(255) NOT NULL,
+    `Genre` VARCHAR(128), -- how large?
     `Availability` BOOLEAN NOT NULL,
     `Page_No` MEDIUMINT UNSIGNED NOT NULL,
     `Edition` TINYINT UNSIGNED DEFAULT NULL,
