@@ -40,7 +40,7 @@ CREATE TABLE `Check_Out` (
     `Checkout_date` DATE NOT NULL DEFAULT(CURRENT_DATE),
     `ISBN` CHAR(17) NOT NULL, -- FK
     `Copy_num` TINYINT UNSIGNED NOT NULL, -- FK
-    PRIMARY KEY (`Library_ID`, `ISBN`, `Copy_num`),
+    KEY (`Library_ID`, `ISBN`, `Copy_num`),
     FOREIGN KEY (`Library_ID`) REFERENCES `Member`(`Library_ID`),
     FOREIGN KEY (`ISBN`, `Copy_num`) REFERENCES `Book_Copy`(`ISBN`, `Copy_num`)
 );

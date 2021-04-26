@@ -62,7 +62,7 @@ CREATE TABLE `Check_Out` (
   `Checkout_date` date NOT NULL DEFAULT (curdate()),
   `ISBN` char(17) NOT NULL,
   `Copy_num` tinyint unsigned NOT NULL,
-  KEY `Library_ID` (`Library_ID`,`ISBN`,`Copy_num`),
+  PRIMARY KEY (`Library_ID`,`ISBN`,`Copy_num`),
   KEY `ISBN` (`ISBN`,`Copy_num`),
   CONSTRAINT `Check_Out_ibfk_1` FOREIGN KEY (`Library_ID`) REFERENCES `Member` (`Library_ID`),
   CONSTRAINT `Check_Out_ibfk_2` FOREIGN KEY (`ISBN`, `Copy_num`) REFERENCES `Book_Copy` (`ISBN`, `Copy_num`)
@@ -75,56 +75,9 @@ CREATE TABLE `Check_Out` (
 
 LOCK TABLES `Check_Out` WRITE;
 /*!40000 ALTER TABLE `Check_Out` DISABLE KEYS */;
-INSERT INTO `Check_Out` (`Library_ID`, `Checkout_date`, `ISBN`, `Copy_num`) VALUES ('6900720420','2021-04-20','9780385504201',2),('6900720420','2021-04-20','9780446364492',2),('6900715776','2021-04-21','9781613821008',1),('6900712420','2021-04-21','9780062658753',3),('6900719369','2021-04-21','9780446310789',1),('6900712420','2021-04-21','9780446310789',3),('6900715776','2021-04-21','9780446310789',4),('6900719356','2021-04-11','9780001857018',1),('6900713609','2021-04-12','9780446364492',2);
+INSERT INTO `Check_Out` (`Library_ID`, `Checkout_date`, `ISBN`, `Copy_num`) VALUES ('6900712420','2021-04-21','9780062658753',3),('6900712420','2021-04-21','9780446310789',3),('6900713609','2021-04-21','9780446364492',2),('6900715776','2021-04-21','9780446310789',4),('6900715776','2021-04-21','9781613821008',1),('6900719356','2021-04-11','9780001857018',1),('6900719369','2021-04-21','9780446310789',1),('6900720420','2021-04-20','9780385504201',2),('6900720420','2021-04-20','9780446364492',2);
 /*!40000 ALTER TABLE `Check_Out` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-/*!50032 DROP TRIGGER IF EXISTS checkDateConstraint */;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`ubuntu`@`localhost`*/ /*!50003 TRIGGER `checkDateConstraint` BEFORE INSERT ON `Check_Out` FOR EACH ROW BEGIN
-    IF NEW.Checkout_date>CURRENT_DATE THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Checkout_date is Constrained to Past and Present Dates.';
-    END IF;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-/*!50032 DROP TRIGGER IF EXISTS isAval */;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`ubuntu`@`localhost`*/ /*!50003 TRIGGER `isAval` BEFORE INSERT ON `Check_Out` FOR EACH ROW BEGIN
-    SELECT COUNT(*) INTO @COUNT FROM `Book_Copy` WHERE `ISBN` = NEW.ISBN AND
-        `Copy_num` = NEW.Copy_num AND `Availability` = 0;
-    IF @COUNT>0 THEN
-        CALL getDueDate(NEW.ISBN, NEW.Copy_num, @DUE);
-        CALL getCheckDate(NEW.ISBN, NEW.Copy_num, @CHECK);
-        CALL getNewDueDate(NEW.ISBN, NEW.Copy_num, NEW.Checkout_date, @NEWDUE);
-        IF (@DUE>=NEW.Checkout_date AND @CHECK<=NEW.Checkout_date) OR @NEWDUE>=@CHECK THEN 
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot Check_Out Unavailable Item.';
-        END IF;
-    END IF;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -136,16 +89,13 @@ DELIMITER ;
 /*!50032 DROP TRIGGER IF EXISTS update_aval */;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`ubuntu`@`localhost`*/ /*!50003 TRIGGER `update_aval` AFTER INSERT ON `Check_Out` FOR EACH ROW BEGIN
-    CALL getDueDate(NEW.ISBN, NEW.Copy_num, @DUE);
-    IF @DUE>=curdate() THEN
-        UPDATE `Book_Copy`
-        SET
-            `Availability` = false
-        WHERE
-            `ISBN` = NEW.ISBN AND
-            `Copy_num` = NEW.Copy_num AND
-            `Availability` = true;
-    END IF;
+    UPDATE `Book_Copy`
+    SET
+        `Availability` = false
+    WHERE
+        `ISBN` = NEW.ISBN AND
+        `Copy_num` = NEW.Copy_num AND
+        `Availability` = true;
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -263,25 +213,6 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `getCheckDate` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `getCheckDate`(in bID char(17), in cID tinyint unsigned, out checkout date)
-BEGIN
-    SET checkout=(SELECT `Checkout_date` FROM `Check_Out` WHERE `ISBN`=bID AND `Copy_num`=cID LIMIT 1);
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `getDueDate` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -292,39 +223,17 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `getDueDate`(in bID char(17), in cID tinyint unsigned, out due date)
+CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `getDueDate`(in bID char(17), cID tinyint unsigned)
 BEGIN
     SET @MULTIPLIER=(SELECT `Renewal` FROM `Book_Copy` WHERE (`ISBN`=bID AND
         `Copy_num`=cID))+1;
     IF @MULTIPLIER<=0 THEN
         SET @MULTIPLIER=1;
     END IF;
-    SET due=(SELECT DATE(ADDDATE(`Checkout_date`, INTERVAL 7*@MULTIPLIER DAY)) FROM `Check_Out` WHERE `ISBN`=bID AND `Copy_num`=cID LIMIT 1);
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `getNewDueDate` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `getNewDueDate`(in bID char(17), in cID tinyint unsigned, in cDT date, out dDT date)
-BEGIN
-    CALL getRenewal(bID,cID,@RENEW);
-    SET @RENEW = @RENEW + 1;
-    IF @RENEW>1 THEN
-        SET dDT=(DATE(ADDDATE(cDT, INTERVAL 7*@RENEW DAY)));
-    ELSE
-        SET dDT=(DATE(ADDDATE(cDT, INTERVAL 7*1 DAY)));
-    END IF;
+    SELECT `Checkout_date`, DATE(ADDDATE(`Checkout_date`, INTERVAL 7*@MULTIPLIER DAY))
+        AS `Due_date`
+    FROM `Check_Out`
+    WHERE `ISBN`=bID AND `Copy_num`=cID;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -351,52 +260,6 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `getRenewal` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `getRenewal`(in bID char(17), in cID tinyint unsigned, out renew tinyint unsigned)
-BEGIN
-    SELECT `Renewal` INTO renew FROM `Book_Copy` WHERE (`ISBN`=bID AND `Copy_num`=cID);
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `showDueDate` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `showDueDate`(in bID char(17), in cID tinyint unsigned)
-BEGIN
-    SET @MULTIPLIER=(SELECT `Renewal` FROM `Book_Copy` WHERE (`ISBN`=bID AND
-        `Copy_num`=cID))+1;
-    IF @MULTIPLIER<=0 THEN
-        SET @MULTIPLIER=1;
-    END IF;
-    SELECT `Checkout_date`, DATE(ADDDATE(`Checkout_date`, INTERVAL 7*@MULTIPLIER DAY))
-        AS `Due_date`
-    FROM `Check_Out`
-    WHERE `ISBN`=bID AND `Copy_num`=cID;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -407,4 +270,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-04-24 17:39:01
+-- Dump completed on 2021-04-23 20:34:12

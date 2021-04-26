@@ -17,9 +17,9 @@ BEGIN
 END;
 ```
 ```mysql
--- get due date from ISBN and C_n
-DROP PROCEDURE IF EXISTS `getDueDate`;
-CREATE PROCEDURE `getDueDate`(in bID char(17), cID tinyint unsigned)
+-- show due date from ISBN and C_n
+DROP PROCEDURE IF EXISTS `showDueDate`;
+CREATE PROCEDURE `showDueDate`(in bID char(17), in cID tinyint unsigned)
 -- bID is ISBN, cID is Copy_num
 BEGIN
     SET @MULTIPLIER=(SELECT `Renewal` FROM `Book_Copy` WHERE (`ISBN`=bID AND
@@ -31,5 +31,52 @@ BEGIN
         AS `Due_date`
     FROM `Check_Out`
     WHERE `ISBN`=bID AND `Copy_num`=cID;
+END;
+```
+```mysql
+-- get due date from ISBN and C_n
+DROP PROCEDURE IF EXISTS `getDueDate`;
+CREATE PROCEDURE `getDueDate`(in bID char(17), in cID tinyint unsigned, out due date)
+-- bID is ISBN, cID is Copy_num, date is returned due_date
+BEGIN
+    SET @MULTIPLIER=(SELECT `Renewal` FROM `Book_Copy` WHERE (`ISBN`=bID AND
+        `Copy_num`=cID))+1;
+    IF @MULTIPLIER<=0 THEN
+        SET @MULTIPLIER=1;
+    END IF;
+    SET due=(SELECT DATE(ADDDATE(`Checkout_date`, INTERVAL 7*@MULTIPLIER DAY)) FROM `Check_Out` WHERE `ISBN`=bID AND `Copy_num`=cID LIMIT 1);
+END;
+```
+```mysql
+-- get checkout date from ISBN and C_n
+DROP PROCEDURE IF EXISTS `getCheckDate`;
+CREATE PROCEDURE `getCheckDate`(in bID char(17), in cID tinyint unsigned, out checkout date)
+-- bID is ISBN, cID is Copy_num, date is returned Checkout_date
+BEGIN
+    SET checkout=(SELECT `Checkout_date` FROM `Check_Out` WHERE `ISBN`=bID AND `Copy_num`=cID LIMIT 1);
+END;
+```
+```mysql
+-- get Renewal from a Book_Copy
+DROP PROCEDURE IF EXISTS `getRenewal`;
+CREATE PROCEDURE `getRenewal`(in bID char(17), in cID tinyint unsigned, out renew tinyint unsigned)
+-- bID is ISBN, cID is Copy_num, times renewed (Renewal) is returned as int
+BEGIN
+    SELECT `Renewal` INTO renew FROM `Book_Copy` WHERE (`ISBN`=bID AND `Copy_num`=cID);
+END;
+```
+```mysql
+-- get new due date
+DROP PROCEDURE IF EXISTS `getNewDueDate`;
+CREATE PROCEDURE `getNewDueDate`(in bID char(17), in cID tinyint unsigned, in cDT date, out dDT date)
+-- bID is ISBN, cID is Copy_num, cDT is checkout_date, dDt is returned due_date
+BEGIN
+    CALL getRenewal(bID,cID,@RENEW);
+    SET @RENEW = @RENEW + 1;
+    IF @RENEW>1 THEN
+        SET dDT=(DATE(ADDDATE(cDT, INTERVAL 7*@RENEW DAY)));
+    ELSE
+        SET dDT=(DATE(ADDDATE(cDT, INTERVAL 7*1 DAY)));
+    END IF;
 END;
 ```
