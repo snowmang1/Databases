@@ -50,7 +50,7 @@ END;
 -- Member cannot check out a book when Strike_Count = 3
 CREATE TRIGGER `threeStrikeConstraint` BEFORE INSERT ON `Check_Out` FOR EACH ROW
 BEGIN
-	CALL getStrikeCount(NEW.Library_ID, @STRIKES);
+    CALL getStrikeCount(NEW.Library_ID, @STRIKES);
     IF 3 = @STRIKES THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot Check Out Book When Member Has Three Strikes.';
     END IF;
