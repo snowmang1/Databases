@@ -28,7 +28,7 @@ BEGIN
         CALL getDueDate(NEW.ISBN, NEW.Copy_num, @DUE);
         CALL getCheckDate(NEW.ISBN, NEW.Copy_num, @CHECK);
         CALL getNewDueDate(NEW.ISBN, NEW.Copy_num, NEW.Checkout_date, @NEWDUE);
-        IF (@DUE>=NEW.Checkout_date AND @CHECK<=NEW.Checkout_date) OR @NEWDUE>=@CHECK THEN 
+        IF (@DUE>=NEW.Checkout_date AND @CHECK<=NEW.Checkout_date) OR @NEWDUE>=@CHECK THEN
             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot Check_Out Unavailable Item.';
         END IF;
     END IF;
@@ -46,3 +46,13 @@ BEGIN
 END;
 ```
 [May need to add DELIMITERS](https://www.mysqltutorial.org/mysql-triggers/mysql-after-insert-trigger/)
+```mysql
+-- Member cannot check out a book when Strike_Count = 3
+CREATE TRIGGER `threeStrikeConstraint` BEFORE INSERT ON `Check_Out` FOR EACH ROW
+BEGIN
+	CALL getStrikeCount(NEW.Library_ID, @STRIKES);
+    IF 3 = @STRIKES THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot Check Out Book When Member Has Three Strikes.';
+    END IF;
+END;
+```
