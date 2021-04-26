@@ -83,7 +83,7 @@ END;
 ```mysql
 -- get Strike_Count of a Member
 DROP PROCEDURE IF EXISTS `getStrikeCount`;
-CREATE PROCEDURE `getStrikeCount`(in lID char(10), out strkCnt TINYINT UNSIGNED)
+CREATE PROCEDURE `getStrikeCount`(in lID char(10), out strkCnt tinyint unsigned)
 -- lID is Library_ID, strkCnt is returned Strike_Count
 BEGIN
 	SELECT `Strike_Count` INTO strkCnt FROM `Member` WHERE `Library_ID` = lID;
