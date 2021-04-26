@@ -80,3 +80,21 @@ BEGIN
     END IF;
 END;
 ```
+```mysql
+-- get Strike_Count of a Member
+DROP PROCEDURE IF EXISTS `getStrikeCount`;
+CREATE PROCEDURE `getStrikeCount`(in lID char(10), out strkCnt TINYINT UNSIGNED)
+-- lID is Library_ID, strkCnt is returned Strike_Count
+BEGIN
+	SELECT `Strike_Count` INTO strkCnt FROM `Member` WHERE `Library_ID` = lID;
+END;
+```
+```mysql
+-- get all books from Book_Copy with a certain genre
+DROP PROCEDURE IF EXISTS `getAllFromGenre`;
+CREATE PROCEDURE `getAllFromGenre`(in gen varchar(128))
+-- gen is Genre
+BEGIN
+	SELECT `ISBN`, `Title`, `Copy_num`, `Availability` FROM `Book_Copy` WHERE `Genre` = gen;
+END;
+```
