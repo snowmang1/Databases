@@ -45,14 +45,15 @@ BEGIN
     END IF;
 END;
 ```
-[May need to add DELIMITERS](https://www.mysqltutorial.org/mysql-triggers/mysql-after-insert-trigger/)
 ```mysql
 -- Member cannot check out a book when Strike_Count = 3
+DROP TRIGGER IF EXISTS `threeStrikeConstraint`;
 CREATE TRIGGER `threeStrikeConstraint` BEFORE INSERT ON `Check_Out` FOR EACH ROW
 BEGIN
     CALL getStrikeCount(NEW.Library_ID, @STRIKES);
     IF 3 = @STRIKES THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot Check Out Book When Member Has Three Strikes.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot Check Out Book When Member Has Three Strikes.';
     END IF;
 END;
 ```
+[May need to add DELIMITERS](https://www.mysqltutorial.org/mysql-triggers/mysql-after-insert-trigger/)

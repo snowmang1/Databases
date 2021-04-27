@@ -90,11 +90,21 @@ BEGIN
 END;
 ```
 ```mysql
--- get all books from Book_Copy with a certain genre
-DROP PROCEDURE IF EXISTS `getAllFromGenre`;
-CREATE PROCEDURE `getAllFromGenre`(in gen varchar(128))
+-- show all books from Book_Copy with a certain genre
+DROP PROCEDURE IF EXISTS `showAllFromGenre`;
+CREATE PROCEDURE `showAllFromGenre`(in gen varchar(128))
 -- gen is Genre
 BEGIN
 	SELECT `ISBN`, `Title`, `Copy_num`, `Availability` FROM `Book_Copy` WHERE `Genre` = gen;
+END;
+```
+```mysql
+-- show Check_Out Table
+DROP PROCEDURE IF EXISTS `showCheckOut`;
+CREATE PROCEDURE `showCheckOut`()
+-- prints all data from Check_Out attaching Names to Library_IDs
+-- ordered by checkout_date
+BEGIN
+    SELECT *, `getName`(`Library_ID`) AS `Name` FROM `Check_Out` ORDER BY `Checkout_date`;
 END;
 ```
