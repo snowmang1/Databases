@@ -4,7 +4,7 @@ DROP TRIGGER IF EXISTS `update_aval`;
 CREATE TRIGGER `update_aval` AFTER INSERT
     ON `Check_Out` FOR EACH ROW
 BEGIN
-    CALL getDueDate(NEW.ISBN, NEW.Copy_num, @DUE);
+    CALL getNewDueDate(NEW.ISBN, NEW.Copy_num, NEW.Checkout_date, @DUE);
     IF @DUE>=curdate() THEN
         UPDATE `Book_Copy`
         SET
@@ -12,7 +12,7 @@ BEGIN
         WHERE
             `ISBN` = NEW.ISBN AND
             `Copy_num` = NEW.Copy_num AND
-            `Availability` = true;
+            `Availability` is true;
     END IF;
 END;
 ```
@@ -28,7 +28,7 @@ BEGIN
         CALL getDueDate(NEW.ISBN, NEW.Copy_num, @DUE);
         CALL getCheckDate(NEW.ISBN, NEW.Copy_num, @CHECK);
         CALL getNewDueDate(NEW.ISBN, NEW.Copy_num, NEW.Checkout_date, @NEWDUE);
-        IF (@DUE>=NEW.Checkout_date AND @CHECK<=NEW.Checkout_date) OR @NEWDUE>=@CHECK THEN
+        IF (@DUE>=NEW.Checkout_date AND @CHECK<=NEW.Checkout_date) OR @NEWDUE>=@CHECK THEN 
             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot Check_Out Unavailable Item.';
         END IF;
     END IF;
@@ -53,6 +53,16 @@ BEGIN
     CALL getStrikeCount(NEW.Library_ID, @STRIKES);
     IF 3 = @STRIKES THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot Check Out Book When Member Has Three Strikes.';
+    END IF;
+END;
+```
+```mysql
+-- No Duplicates in Check_Out
+DROP TRIGGER IF EXISTS `checkOutDupes`;
+CREATE TRIGGER `checkOutDupes` BEFORE INSERT ON `Check_Out` FOR EACH ROW
+BEGIN
+    IF (SELECT COUNT(*) FROM `Check_Out` WHERE(`Library_ID`=NEW.Library_ID AND `Checkout_date`=NEW.Checkout_date AND `ISBN`=NEW.ISBN AND `Copy_num`=NEW.Copy_num))>0 THEN
+         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Duplicate entry on Check Out.';
     END IF;
 END;
 ```
