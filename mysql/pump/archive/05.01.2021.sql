@@ -1,5 +1,5 @@
 -- Dump created by MySQL pump utility, version: 8.0.23, Linux (aarch64)
--- Dump start time: Wed May  5 22:05:32 2021
+-- Dump start time: Sat May  1 20:33:52 2021
 -- Server version: 8.0.23
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -81,11 +81,7 @@ DELIMITER ;
 ;
 DELIMITER //
 /*!50017 CREATE*/ /*!50003 DEFINER=`ubuntu`@`localhost`*/ /*!50017 TRIGGER `teamProject`.`checkOutDupes` BEFORE INSERT ON `Check_Out` FOR EACH ROW BEGIN
-    IF (SELECT COUNT(*) FROM `Check_Out` WHERE
-    (
-        `Library_ID`=NEW.Library_ID
-    AND `Checkout_date`=NEW.Checkout_date AND `ISBN`=NEW.ISBN AND `Copy_num`=NEW.Copy_num
-    ))>0 THEN
+    IF (SELECT COUNT(*) FROM `Check_Out` WHERE(`Library_ID`=NEW.Library_ID AND `Checkout_date`=NEW.Checkout_date AND `ISBN`=NEW.ISBN AND `Copy_num`=NEW.Copy_num))>0 THEN
          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Duplicate entry on Check Out.';
     END IF;
 END */
@@ -103,17 +99,6 @@ DELIMITER //
             `ISBN` = NEW.ISBN AND
             `Copy_num` = NEW.Copy_num AND
             `Availability` is true;
-    END IF;
-END */
-//
-DELIMITER ;
-;
-DELIMITER //
-/*!50017 CREATE*/ /*!50003 DEFINER=`ubuntu`@`localhost`*/ /*!50017 TRIGGER `teamProject`.`updateOverdue` AFTER INSERT ON `Check_Out` FOR EACH ROW BEGIN
-    IF (getDDbCD(New.ISBN,NEW.Copy_num,NEW.Checkout_date)<curdate()) THEN
-        IF (SELECT COUNT(*) FROM `Overdue_Books` WHERE `ISBN`=NEW.ISBN AND `Copy_num`=NEW.Copy_num)<1 THEN
-            INSERT INTO `Overdue_Books` VALUES (NEW.Library_ID,NEW.ISBN,NEW.Copy_num);
-        END IF;
     END IF;
 END */
 //
@@ -150,9 +135,9 @@ CREATE TABLE `teamProject`.`Overdue_Books` (
 PRIMARY KEY (`Library_ID`,`ISBN`,`Copy_num`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 ;
-INSERT INTO `teamProject`.`Overdue_Books` (`Library_ID`,`ISBN`,`Copy_num`) VALUES ("6900719356","9780001857018",1),("6900719356","9780446364492",2);
+INSERT INTO `teamProject`.`Overdue_Books` (`Library_ID`,`ISBN`,`Copy_num`) VALUES ("6900719356","9780001857018",1);
 USE `teamProject`;
-ALTER TABLE `teamProject`.`Overdue_Books` ADD UNIQUE KEY `Overdue_books` (`ISBN`,`Copy_num`);
+ALTER TABLE `teamProject`.`Overdue_Books` ADD KEY `Overdue_books` (`ISBN`,`Copy_num`);
 ALTER TABLE `teamProject`.`Overdue_Books` ADD CONSTRAINT `Overdue_Books_ibfk_1` FOREIGN KEY (`Library_ID`) REFERENCES `Member` (`Library_ID`);
 ALTER TABLE `teamProject`.`Overdue_Books` ADD CONSTRAINT `Overdue_Books_ibfk_2` FOREIGN KEY (`ISBN`, `Copy_num`) REFERENCES `Book_Copy` (`ISBN`, `Copy_num`);
 DROP TABLE IF EXISTS `teamProject`.`Preferences`;
@@ -232,13 +217,7 @@ DELIMITER //
 CREATE PROCEDURE `teamProject`.`getRenewal`(in bID char(17), in cID tinyint unsigned, out renew tinyint unsigned)
 BEGIN
     IF (SELECT COUNT(*) FROM `Check_Out` WHERE `ISBN`=bID AND `Copy_num`=cID)>0 THEN
-        SELECT `Renewal` INTO renew FROM `Check_Out` WHERE
-        (
-            `Checkout_date` IN (SELECT MAX(`Checkout_date`) FROM `Check_Out` WHERE
-                (
-                    `ISBN`=bID AND `Copy_num`=cID
-                ))
-        )LIMIT 1;
+        SELECT `Renewal` INTO renew FROM `Check_Out` WHERE `Checkout_date` IN (SELECT MAX(`Checkout_date`) FROM `Check_Out` WHERE `ISBN`=bID AND `Copy_num`=cID) LIMIT 1;
     ELSE
         SET renew=0;
     END IF;
@@ -260,35 +239,25 @@ END//
 DELIMITER ;
 ;
 DELIMITER //
-CREATE PROCEDURE `teamProject`.`showCheckOut`()
-BEGIN
-    SELECT
-        C.`Library_ID`,
-        `getName`(C.`Library_ID`) AS `Name`,
-        C.`ISBN`,
-        B.`Title`,
-        B.`Author`,
-        C.`Copy_num`,
-        C.`Checkout_date`,
-        getDDbCD(C.`ISBN`,C.`Copy_num`,C.`Checkout_date`) AS `Due_date`,
-        C.`Renewal` AS `Renewed`
-    FROM 
-        `Check_Out` AS C,
-        `Book_Copy` AS B
-    WHERE
-    (
-        B.`ISBN` = C.`ISBN`
-    AND B.`Copy_num` = C.`Copy_num`
-    )
-    ORDER BY C.`Checkout_date`;
-END//
-DELIMITER ;
-;
-DELIMITER //
 CREATE PROCEDURE `teamProject`.`showAvalCopies`(in bkId char(17))
 BEGIN
     SELECT `Copy_num` AS `Available Copies`, `Condition`
     FROM `Book_Copy` WHERE `ISBN`=bkId AND `Availability` is true ORDER BY `Condition` desc;
+END//
+DELIMITER ;
+;
+DELIMITER //
+CREATE PROCEDURE `teamProject`.`showCheckOut`()
+BEGIN
+    SELECT
+        `Library_ID`,
+        `getName`(`Library_ID`) AS `Name`,
+        `ISBN`,
+        `Copy_num`,
+        `Checkout_date`,
+        getDDbCD(`ISBN`,`Copy_num`,`Checkout_date`) AS `Due_date`,
+        `Renewal` AS `Renewed`
+    FROM `Check_Out` ORDER BY `Checkout_date`;
 END//
 DELIMITER ;
 ;
@@ -307,46 +276,10 @@ END//
 DELIMITER ;
 ;
 DELIMITER //
-CREATE PROCEDURE `teamProject`.`showPopAuth`()
-BEGIN
-    Select
-        B.`Author`,
-        COUNT(C.`ISBN`) AS `Popularity`
-    FROM
-        `Book_Copy` AS B,
-        `Check_Out` AS C
-    WHERE
-    (
-        B.`ISBN` = C.`ISBN`
-    AND B.`Copy_num` = C.`Copy_num`
-    )GROUP BY `Author`
-    ORDER BY `Popularity` DESC;
-END//
-DELIMITER ;
-;
-DELIMITER //
 CREATE PROCEDURE `teamProject`.`showQuantity`(in bkId char(17))
 BEGIN
     SELECT `Title`, COUNT(*) AS `Quantity`
     FROM `Book_Copy` WHERE `ISBN`=bkId GROUP BY `Title`;
-END//
-DELIMITER ;
-;
-DELIMITER //
-CREATE PROCEDURE `teamProject`.`showPopBook`()
-BEGIN
-    SELECT
-        B.`Title`,
-        COUNT(C.`ISBN`) AS `Popularity`
-    FROM
-        `Book_Copy` AS B,
-        `Check_Out` AS C
-    WHERE
-    (
-        B.`ISBN` = C.`ISBN`
-    AND B.`Copy_num` = C.`Copy_num`
-    )GROUP BY `Title`
-    ORDER BY `Popularity` DESC;
 END//
 DELIMITER ;
 ;
@@ -357,4 +290,4 @@ SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 SET SQL_MODE=@OLD_SQL_MODE;
--- Dump end time: Wed May  5 22:05:32 2021
+-- Dump end time: Sat May  1 20:33:52 2021

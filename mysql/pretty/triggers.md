@@ -66,4 +66,16 @@ BEGIN
     END IF;
 END;
 ```
+```mysql
+-- update Overdue_Books
+DROP TRIGGER IF EXISTS `updateOverdue`;
+CREATE TRIGGER `updateOverdue` AFTER INSERT ON `Check_Out` FOR EACH ROW
+BEGIN
+    IF (getDDbCD(New.ISBN,NEW.Copy_num,NEW.Checkout_date)<curdate()) THEN
+        IF (SELECT COUNT(*) FROM `Overdue_Books` WHERE `ISBN`=NEW.ISBN AND `Copy_num`=NEW.Copy_num)<1 THEN
+            INSERT INTO `Overdue_Books` VALUES (NEW.Library_ID,NEW.ISBN,NEW.Copy_num);
+        END IF;
+    END IF;
+END;
+```
 [May need to add DELIMITERS](https://www.mysqltutorial.org/mysql-triggers/mysql-after-insert-trigger/)

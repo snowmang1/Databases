@@ -16,14 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `teamProject`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `teamProject` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-
-USE `teamProject`;
-
---
 -- Table structure for table `Book_Copy`
 --
 
@@ -165,11 +157,7 @@ DELIMITER ;
 /*!50032 DROP TRIGGER IF EXISTS checkOutDupes */;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`ubuntu`@`localhost`*/ /*!50003 TRIGGER `checkOutDupes` BEFORE INSERT ON `Check_Out` FOR EACH ROW BEGIN
-    IF (SELECT COUNT(*) FROM `Check_Out` WHERE
-    (
-        `Library_ID`=NEW.Library_ID
-    AND `Checkout_date`=NEW.Checkout_date AND `ISBN`=NEW.ISBN AND `Copy_num`=NEW.Copy_num
-    ))>0 THEN
+    IF (SELECT COUNT(*) FROM `Check_Out` WHERE(`Library_ID`=NEW.Library_ID AND `Checkout_date`=NEW.Checkout_date AND `ISBN`=NEW.ISBN AND `Copy_num`=NEW.Copy_num))>0 THEN
          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Duplicate entry on Check Out.';
     END IF;
 END */;;
@@ -198,28 +186,6 @@ DELIMITER ;;
             `ISBN` = NEW.ISBN AND
             `Copy_num` = NEW.Copy_num AND
             `Availability` is true;
-    END IF;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-/*!50032 DROP TRIGGER IF EXISTS updateOverdue */;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`ubuntu`@`localhost`*/ /*!50003 TRIGGER `updateOverdue` AFTER INSERT ON `Check_Out` FOR EACH ROW BEGIN
-    IF (getDDbCD(New.ISBN,NEW.Copy_num,NEW.Checkout_date)<curdate()) THEN
-        IF (SELECT COUNT(*) FROM `Overdue_Books` WHERE `ISBN`=NEW.ISBN AND `Copy_num`=NEW.Copy_num)<1 THEN
-            INSERT INTO `Overdue_Books` VALUES (NEW.Library_ID,NEW.ISBN,NEW.Copy_num);
-        END IF;
     END IF;
 END */;;
 DELIMITER ;
@@ -273,7 +239,7 @@ CREATE TABLE `Overdue_Books` (
   `ISBN` char(17) NOT NULL,
   `Copy_num` tinyint unsigned NOT NULL,
   PRIMARY KEY (`Library_ID`,`ISBN`,`Copy_num`),
-  UNIQUE KEY `Overdue_books` (`ISBN`,`Copy_num`),
+  KEY `Overdue_books` (`ISBN`,`Copy_num`),
   CONSTRAINT `Overdue_Books_ibfk_1` FOREIGN KEY (`Library_ID`) REFERENCES `Member` (`Library_ID`),
   CONSTRAINT `Overdue_Books_ibfk_2` FOREIGN KEY (`ISBN`, `Copy_num`) REFERENCES `Book_Copy` (`ISBN`, `Copy_num`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -285,7 +251,7 @@ CREATE TABLE `Overdue_Books` (
 
 LOCK TABLES `Overdue_Books` WRITE;
 /*!40000 ALTER TABLE `Overdue_Books` DISABLE KEYS */;
-INSERT INTO `Overdue_Books` (`Library_ID`, `ISBN`, `Copy_num`) VALUES ('6900719356','9780001857018',1),('6900719356','9780446364492',2);
+INSERT INTO `Overdue_Books` (`Library_ID`, `ISBN`, `Copy_num`) VALUES ('6900719356','9780001857018',1);
 /*!40000 ALTER TABLE `Overdue_Books` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -453,13 +419,7 @@ DELIMITER ;;
 CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `getRenewal`(in bID char(17), in cID tinyint unsigned, out renew tinyint unsigned)
 BEGIN
     IF (SELECT COUNT(*) FROM `Check_Out` WHERE `ISBN`=bID AND `Copy_num`=cID)>0 THEN
-        SELECT `Renewal` INTO renew FROM `Check_Out` WHERE
-        (
-            `Checkout_date` IN (SELECT MAX(`Checkout_date`) FROM `Check_Out` WHERE
-                (
-                    `ISBN`=bID AND `Copy_num`=cID
-                ))
-        )LIMIT 1;
+        SELECT `Renewal` INTO renew FROM `Check_Out` WHERE `Checkout_date` IN (SELECT MAX(`Checkout_date`) FROM `Check_Out` WHERE `ISBN`=bID AND `Copy_num`=cID) LIMIT 1;
     ELSE
         SET renew=0;
     END IF;
@@ -540,24 +500,14 @@ DELIMITER ;;
 CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `showCheckOut`()
 BEGIN
     SELECT
-        C.`Library_ID`,
-        `getName`(C.`Library_ID`) AS `Name`,
-        C.`ISBN`,
-        B.`Title`,
-        B.`Author`,
-        C.`Copy_num`,
-        C.`Checkout_date`,
-        getDDbCD(C.`ISBN`,C.`Copy_num`,C.`Checkout_date`) AS `Due_date`,
-        C.`Renewal` AS `Renewed`
-    FROM 
-        `Check_Out` AS C,
-        `Book_Copy` AS B
-    WHERE
-    (
-        B.`ISBN` = C.`ISBN`
-    AND B.`Copy_num` = C.`Copy_num`
-    )
-    ORDER BY C.`Checkout_date`;
+        `Library_ID`,
+        `getName`(`Library_ID`) AS `Name`,
+        `ISBN`,
+        `Copy_num`,
+        `Checkout_date`,
+        getDDbCD(`ISBN`,`Copy_num`,`Checkout_date`) AS `Due_date`,
+        `Renewal` AS `Renewed`
+    FROM `Check_Out` ORDER BY `Checkout_date`;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -584,66 +534,6 @@ BEGIN
     SELECT `Checkout_date`, DATE(ADDDATE(`Checkout_date`, INTERVAL 7*@MULTIPLIER DAY)) AS `Due_date`
     FROM `Check_Out`
     WHERE `ISBN`=bID AND `Copy_num`=cID;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `showPopAuth` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `showPopAuth`()
-BEGIN
-    Select
-        B.`Author`,
-        COUNT(C.`ISBN`) AS `Popularity`
-    FROM
-        `Book_Copy` AS B,
-        `Check_Out` AS C
-    WHERE
-    (
-        B.`ISBN` = C.`ISBN`
-    AND B.`Copy_num` = C.`Copy_num`
-    )GROUP BY `Author`
-    ORDER BY `Popularity` DESC;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `showPopBook` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`ubuntu`@`localhost` PROCEDURE `showPopBook`()
-BEGIN
-    SELECT
-        B.`Title`,
-        COUNT(C.`ISBN`) AS `Popularity`
-    FROM
-        `Book_Copy` AS B,
-        `Check_Out` AS C
-    WHERE
-    (
-        B.`ISBN` = C.`ISBN`
-    AND B.`Copy_num` = C.`Copy_num`
-    )GROUP BY `Title`
-    ORDER BY `Popularity` DESC;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -680,4 +570,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-05-05 22:11:14
+-- Dump completed on 2021-05-01 20:35:00

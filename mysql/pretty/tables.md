@@ -52,7 +52,7 @@ CREATE TABLE `Overdue_Books` (
     `ISBN` CHAR(17) NOT NULL, -- FK
     `Copy_num` TINYINT UNSIGNED NOT NULL, -- FK
     PRIMARY KEY (`Library_ID`, `ISBN`, `Copy_num`),
-    KEY `Overdue_books` (`ISBN`,`Copy_num`), -- valid multi-valued attribute
+    UNIQUE KEY `Overdue_books` (`ISBN`,`Copy_num`), -- valid multi-valued attribute
     FOREIGN KEY (`Library_ID`) REFERENCES `Member`(`Library_ID`),
     FOREIGN KEY (`ISBN`, `Copy_num`) REFERENCES `Book_Copy`(`ISBN`, `Copy_num`)
 );

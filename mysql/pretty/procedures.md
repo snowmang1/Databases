@@ -63,7 +63,13 @@ CREATE PROCEDURE `getRenewal`(in bID char(17), in cID tinyint unsigned, out rene
 -- bID is ISBN, cID is Copy_num, times renewed (Renewal) is returned as int
 BEGIN
     IF (SELECT COUNT(*) FROM `Check_Out` WHERE `ISBN`=bID AND `Copy_num`=cID)>0 THEN
-        SELECT `Renewal` INTO renew FROM `Check_Out` WHERE `Checkout_date` IN (SELECT MAX(`Checkout_date`) FROM `Check_Out` WHERE `ISBN`=bID AND `Copy_num`=cID) LIMIT 1;
+        SELECT `Renewal` INTO renew FROM `Check_Out` WHERE
+        (
+            `Checkout_date` IN (SELECT MAX(`Checkout_date`) FROM `Check_Out` WHERE
+                (
+                    `ISBN`=bID AND `Copy_num`=cID
+                ))
+        )LIMIT 1;
     ELSE
         SET renew=0;
     END IF;
@@ -108,16 +114,69 @@ DROP PROCEDURE IF EXISTS `showCheckOut`;
 CREATE PROCEDURE `showCheckOut`()
 -- prints all data from Check_Out attaching Names to Library_IDs
 -- ordered by checkout_date
--- Now displays due_dates and times renewed
 BEGIN
     SELECT
-        `Library_ID`,
-        `getName`(`Library_ID`) AS `Name`,
-        `ISBN`,
-        `Copy_num`,
-        `Checkout_date`,
-        getDDbCD(`ISBN`,`Copy_num`,`Checkout_date`) AS `Due_date`,
-        `Renewal` AS `Renewed`
-    FROM `Check_Out` ORDER BY `Checkout_date`;
+        C.`Library_ID`,
+        `getName`(C.`Library_ID`) AS `Name`,
+        C.`ISBN`,
+        B.`Title`,
+        B.`Author`,
+        C.`Copy_num`,
+        C.`Checkout_date`,
+        getDDbCD(C.`ISBN`,C.`Copy_num`,C.`Checkout_date`) AS `Due_date`,
+        C.`Renewal` AS `Renewed`
+    FROM 
+        `Check_Out` AS C,
+        `Book_Copy` AS B
+    WHERE
+    (
+        B.`ISBN` = C.`ISBN`
+    AND B.`Copy_num` = C.`Copy_num`
+    )
+    ORDER BY C.`Checkout_date`;
+END;
+```
+## Report Procedures
+```mysql
+-- show list of authors sorted by popularity
+DROP PROCEDURE IF EXISTS `showPopAuth`;
+CREATE PROCEDURE `showPopAuth`()
+-- prints 2 columns:
+-- Author name, popularity rating
+-- 2nd col is # of checkout's where author's book was checked out
+BEGIN
+    Select
+        B.`Author`,
+        COUNT(C.`ISBN`) AS `Popularity`
+    FROM
+        `Book_Copy` AS B,
+        `Check_Out` AS C
+    WHERE
+    (
+        B.`ISBN` = C.`ISBN`
+    AND B.`Copy_num` = C.`Copy_num`
+    )GROUP BY `Author`
+    ORDER BY `Popularity` DESC;
+END;
+```
+```mysql
+-- show list of books sorted by popularity
+DROP PROCEDURE IF EXISTS `showPopBook`;
+CREATE PROCEDURE `showPopBook`()
+-- prints 2 cols: Book Title, pop. rating
+-- pop. rating is number of times book was checked out
+BEGIN
+    SELECT
+        B.`Title`,
+        COUNT(C.`ISBN`) AS `Popularity`
+    FROM
+        `Book_Copy` AS B,
+        `Check_Out` AS C
+    WHERE
+    (
+        B.`ISBN` = C.`ISBN`
+    AND B.`Copy_num` = C.`Copy_num`
+    )GROUP BY `Title`
+    ORDER BY `Popularity` DESC;
 END;
 ```
