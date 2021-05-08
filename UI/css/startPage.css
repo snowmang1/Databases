@@ -1,0 +1,44 @@
+body{
+  background-color: #aaaaaa;
+}
+div{
+  text-align: center;
+  border: solid;
+  border-color: #000000;
+  border-width: thin;
+  margin-left: 25%;
+  margin-right: 25%;
+  margin-top: 10%;
+  box-shadow: .5em .5em 1em .1em #777777;
+}
+form{
+  padding-bottom: .5em;
+}
+input[type=text] {
+  border:none;
+  background-color: #aaaaaa;
+  color: #ffffff;
+  border-bottom: thin solid;
+  border-color: #000000;
+}
+a{
+  color: #000000;
+  border-radius: 1em;
+  border: .15em solid;
+  text-decoration: none;
+  padding-top: .09em;
+  padding-bottom: .09em;
+  padding-left: .2em;
+  padding-right: .2em;
+  border-right-color: white;
+  border-bottom-color: white;
+  box-shadow: .12em .12em .2em .08em #777777;
+}
+a:active{
+  color: pink;
+  border-bottom-color: black;
+  border-right-color: black;
+  border-left-color: white;
+  border-top-color: white;
+  box-shadow: -.1em -.1em .3em .05em #777777;
+}
