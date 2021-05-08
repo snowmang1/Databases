@@ -2,26 +2,26 @@
 ```mysql
 INSERT INTO book_copy
 VALUES 
-('The Da Vinci Code','Dan Brown','Mystery Thriller',TRUE,689,1,4,DEFAULT,1,"9780385504201"),
-('The Da Vinci Code','Dan Brown','Mystery Thriller',FALSE,689,1,1,DEFAULT,2,"9780385504201"),
-('The Da Vinci Code','Dan Brown','Mystery Thriller',TRUE,689,1,5,DEFAULT,3,"9780385504201"),
-('Harry Potter and the Philosopher\'s Stone','J. K. Rowling','Fantasy',TRUE,309,5,3,DEFAULT,2,"9780747532743"),
-('Harry Potter and the Philosopher\'s Stone','J. K. Rowling','Fantasy',TRUE,309,5,1,DEFAULT,1,"9780747532743"),
-('The Hobbit','	J. R. R. Tolkien','High fantasy',TRUE,310,2,5,DEFAULT,1,"9780547928227"),
-('The Hobbit','	J. R. R. Tolkien','High fantasy',TRUE,310,2,5,DEFAULT,2,"9780547928227"),
-('The Lion, the Witch and the Wardrobe','C. S. Lewis','Children\'s fantasy',FALSE,208,1,2,DEFAULT,1,"9780001857018"),
-('The Lion, the Witch and the Wardrobe','C. S. Lewis','Children\'s fantasy',TRUE,208,1,3,DEFAULT,2,"9780001857018"),
-('The Bridges of Madison County','Robert James Waller','Romance novel',TRUE,192,1,4,DEFAULT,1,"9780446364492"),
-('The Bridges of Madison County','Robert James Waller','Romance novel',FALSE,192,1,3,DEFAULT,2,"9780446364492"),
-('Black Beauty','Anna Sewell','Novel',FALSE,255,1,5,DEFAULT,1,"9781613821008"),
-('Black Beauty','Anna Sewell','Novel',TRUE,255,1,3,DEFAULT,2,"9781613821008"),
-('Charlotte\'s Web','E. B. White','Children\'s literature',TRUE,192,1,4,DEFAULT,1,"9780062658753"),
-('Charlotte\'s Web','E. B. White','Children\'s literature',TRUE,192,1,3,DEFAULT,2,"9780062658753"),
-('Charlotte\'s Web','E. B. White','Children\'s literature',FALSE,192,1,3,DEFAULT,3,"9780062658753"),
-('To Kill a Mockingbird','Harper Lee','Southern Gothic',FALSE,281,1,4,DEFAULT,1,"9780446310789"),
-('To Kill a Mockingbird','Harper Lee','Southern Gothic',TRUE,281,1,1,DEFAULT,2,"9780446310789"),
-('To Kill a Mockingbird','Harper Lee','Southern Gothic',FALSE,281,1,3,DEFAULT,3,"9780446310789"),
-('To Kill a Mockingbird','Harper Lee','Southern Gothic',FALSE,281,1,4,DEFAULT,4,"9780446310789");
+('The Da Vinci Code','Dan Brown','Mystery Thriller',DEFAULT,689,1,4,1,"9780385504201"),
+('The Da Vinci Code','Dan Brown','Mystery Thriller',DEFAULT,689,1,1,2,"9780385504201"),
+('The Da Vinci Code','Dan Brown','Mystery Thriller',DEFAULT,689,1,5,3,"9780385504201"),
+('Harry Potter and the Philosopher\'s Stone','J. K. Rowling','Fantasy',DEFAULT,309,5,3,2,"9780747532743"),
+('Harry Potter and the Philosopher\'s Stone','J. K. Rowling','Fantasy',DEFAULT,309,5,1,1,"9780747532743"),
+('The Hobbit','	J. R. R. Tolkien','High fantasy',DEFAULT,310,2,5,1,"9780547928227"),
+('The Hobbit','	J. R. R. Tolkien','High fantasy',DEFAULT,310,2,5,2,"9780547928227"),
+('The Lion, the Witch and the Wardrobe','C. S. Lewis','Children\'s fantasy',DEFAULT,208,1,2,1,"9780001857018"),
+('The Lion, the Witch and the Wardrobe','C. S. Lewis','Children\'s fantasy',DEFAULT,208,1,3,2,"9780001857018"),
+('The Bridges of Madison County','Robert James Waller','Romance novel',DEFAULT,192,1,4,1,"9780446364492"),
+('The Bridges of Madison County','Robert James Waller','Romance novel',DEFAULT,192,1,3,2,"9780446364492"),
+('Black Beauty','Anna Sewell','Novel',DEFAULT,255,1,5,1,"9781613821008"),
+('Black Beauty','Anna Sewell','Novel',DEFAULT,255,1,3,2,"9781613821008"),
+('Charlotte\'s Web','E. B. White','Children\'s literature',DEFAULT,192,1,4,1,"9780062658753"),
+('Charlotte\'s Web','E. B. White','Children\'s literature',DEFAULT,192,1,3,2,"9780062658753"),
+('Charlotte\'s Web','E. B. White','Children\'s literature',DEFAULT,192,1,3,3,"9780062658753"),
+('To Kill a Mockingbird','Harper Lee','Southern Gothic',DEFAULT,281,1,4,1,"9780446310789"),
+('To Kill a Mockingbird','Harper Lee','Southern Gothic',DEFAULT,281,1,1,2,"9780446310789"),
+('To Kill a Mockingbird','Harper Lee','Southern Gothic',DEFAULT,281,1,3,3,"9780446310789"),
+('To Kill a Mockingbird','Harper Lee','Southern Gothic',DEFAULT,281,1,4,4,"9780446310789");
 ```
 ## Member Data
 ```mysql
@@ -38,15 +38,14 @@ VALUES
 ```mysql
 INSERT INTO Check_Out
 VALUES
-("6900720420",'2021/04/20',"9780385504201",2),
-("6900720420",'2021/04/20',"9780446364492",2),
-("6900713609",'2021/4/12',"9780446364492",2),
-("6900715776",'2021/4/21',"9781613821008",1),
-("6900712420",'2021/4/21',"9780062658753",3),
-("6900719369",'2021/4/21',"9780446310789",1),
-("6900712420",'2021/4/21',"9780446310789",3),
-("6900715776",'2021/4/21',"9780446310789",4),
-("6900719356",'2021/04/11',"9780001857018",1);
+("6900720420",'2021/04/30',"9780385504201",2,DEFAULT),
+("6900720420",'2021/04/30',"9780446364492",2,DEFAULT),
+("6900715776",'2021/4/30',"9781613821008",1,1),
+("6900712420",'2021/4/30',"9780062658753",3,DEFAULT)
+("6900719369",'2021/4/30',"9780446310789",1,DEFAULT);
+("6900712420",'2021/4/30',"9780446310789",3,DEFAULT),
+("6900719356",'2021/04/21',"9780001857018",1,2),
+("6900715776",'2021/4/30',"9780446310789",4,DEFAULT);
 ```
 ## Overdue_Books Data
 ```mysql
