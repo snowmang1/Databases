@@ -1,0 +1,1 @@
+I (Max Kapral) have switched to MariaDB as my management engine for MySQL. This software unfortunately does not support the mysqlpump utility so only mysqldump will be maintained.

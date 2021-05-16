@@ -10,8 +10,8 @@ CREATE TABLE `Member` (
     `State` CHAR(2),
     `Strike_Count` TINYINT UNSIGNED NOT NULL DEFAULT(0) CHECK (`Strike_Count` BETWEEN 0 AND 3), -- assuming baseball
     `Payment_Method` VARCHAR(32) NOT NULL,
-    `Outstanding_Balance` DECIMAL(4,2) CHECK (`Outstanding_Balance` BETWEEN 0.00 AND 100.00)
-        /* constrain between $0.00 & $99.99 */
+    `Outstanding_Balance` DECIMAL(5,2) DEFAULT(0.00) CHECK (`Outstanding_Balance` BETWEEN 0.00 AND 1000.00)
+        /* constrain between 0.00 & 999.99 */
 );
 DROP TABLE IF EXISTS `Preferences`;
 CREATE TABLE `Preferences` (
